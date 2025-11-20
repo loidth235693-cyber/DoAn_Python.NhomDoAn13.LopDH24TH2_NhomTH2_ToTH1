@@ -1,8 +1,8 @@
 # ===================== Cấu hình giao diện chung =====================
 
 # ---- Màu sắc giao diện ----
-BG_COLOR  = "#B8D2F7"   # Xanh lam nhạt lạnh, làm nền tổng thể
-PANEL_BG  = "#3691F1"   # Xanh indigo đậm, cho Panel nổi bật
+BG_COLOR  = "#F2F7B8"   # Xanh lam nhạt lạnh, làm nền tổng thể
+PANEL_BG  = "#D2DB26"   # Xanh indigo đậm, cho Panel nổi bật
 TITLE_BG  = "#8196E4"  # Màu lam lạnh cho tiêu đề
 FG_COLOR = "#000000"      # Màu chữ chính
 

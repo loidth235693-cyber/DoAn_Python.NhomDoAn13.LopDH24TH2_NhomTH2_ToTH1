@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import datetime
-from connect_db import connect_db  # import trực tiếp hàm
+from connect_db import connect_db 
 
 import font  # import module font để sử dụng cấu hình giao diện
 # ====== LOG ĐĂNG NHẬP ======
@@ -108,12 +108,26 @@ def focus_prev_widget(event, prev_widget):
     prev_widget.focus()
     return "break"
 
+def center_window(window, width, height):
+    # Lấy kích thước màn hình
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    # Tính toán vị trí x và y để căn giữa
+    x = (screen_width // 2) - (width // 2)
+    y = (screen_height // 2) - (height // 2)
+
+    # Đặt kích thước và vị trí của cửa sổ
+    window.geometry(f'{width}x{height}+{x}+{y}')
+
 # ====== GIAO DIỆN TKINTER ======
 main_window = tk.Tk()
 main_window.title("🎓 Đăng nhập hệ thống quản lý học sinh")
 main_window.geometry("420x340")
 main_window.configure(bg="#E8F4FB")
 main_window.resizable(False, False)
+window_width = 420
+window_height = 340
 
 # --- Tiêu đề ---
 tk.Label(
@@ -153,4 +167,5 @@ entry_pass.bind("<Return>", lambda e: login())
 entry_pass.bind("<Up>", lambda e: focus_prev_widget(e, entry_user))
 entry_user.bind("<Down>", lambda e: focus_next_widget(e, entry_pass))
 
+center_window(main_window, window_width, window_height)
 main_window.mainloop()

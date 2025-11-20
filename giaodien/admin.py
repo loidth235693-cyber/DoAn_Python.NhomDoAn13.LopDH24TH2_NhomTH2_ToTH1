@@ -10,13 +10,14 @@ from tkcalendar import DateEntry
 
 def admin_window():
     admin_window = tk.Tk()
-    admin_window.title("ADMIN")
+    admin_window.title("🎓ADMIN")
     admin_window.geometry("1200x700")
     admin_window.configure(bg="#E8F4FB")
 
     for i in range(3):
         admin_window.grid_rowconfigure(i, weight=1)
     admin_window.grid_columnconfigure(0, weight=1)
+    
     # ====== Tiêu đề chính ======
     title_label = tk.Label(
         admin_window,
@@ -28,7 +29,7 @@ def admin_window():
     admin_window.grid_rowconfigure(0, weight=1)
 
     style = ttk.Style()
-    style.theme_use('default')  # đảm bảo theme mặc định để có thể chỉnh màu
+    style.theme_use('default') 
     style.configure('TNotebook.Tab', background="#E8F4FB", foreground='black', padding=[10, 5])
     
     # ====== Notebook chính ======
@@ -61,7 +62,7 @@ def admin_window():
     sub_notebook_tt.add(tab_giaovien, text="Giáo viên")
         
     # ============================================================
-    # ---------------------- TAB THÔNG TIN HỌC SINH ------------------------
+    # ---------------------- TAB THÔNG TIN HỌC SINH --------------
     # ============================================================
     scrollable_frame = ttk.Frame(tab_hocsinh)
     scrollable_frame.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
@@ -186,6 +187,11 @@ def admin_window():
     lbl_tongtien = tk.Label(frame_phi, text="0", fg="#006400", bg=font.BG_COLOR, font=font.FONT_CHU)
     lbl_tongtien.grid(row=3, column=1, sticky="w", padx=5, pady=5)
 
+    tk.Label(frame_phi, text="Hoàn cảnh:", anchor="w", width=12,
+             bg=font.BG_COLOR, fg=font.FG_COLOR, font=font.FONT_CHU).grid(row=3, column=2, sticky="e", padx=5, pady=5)
+    combo_hc = ttk.Combobox(frame_phi, values=["Hộ nghèo", "Bình thường"], width=10)
+    combo_hc.grid(row=3, column=3, sticky="w", padx=5, pady=5)
+
     # Enable/disable combobox BHYT/BHTN
     var_bhyt.trace_add("write", lambda *args: combo_bhyt.config(state="readonly" if var_bhyt.get()==1 else "disabled"))
     var_bhtn.trace_add("write", lambda *args: combo_bhtn.config(state="readonly" if var_bhtn.get()==1 else "disabled"))
@@ -198,7 +204,7 @@ def admin_window():
     frame_ds_hs.grid_rowconfigure(0, weight=1)
     frame_ds_hs.grid_columnconfigure(0, weight=1)
 
-    # NOTEBOOK danh sách học sinh
+    # Khung tab danh sách học sinh
     notebook_hs = ttk.Notebook(frame_ds_hs)
     notebook_hs.grid(row=0, column=0, sticky="nsew")
 
@@ -261,28 +267,24 @@ def admin_window():
                 "BHYT","Tháng BHYT","BHTN","Mức BHTN","Tổng tiền"]
     tree_phi = create_treeview(tab_phi, cols_phi, height=3)
 
-    # ===================== HỆ THỐNG ĐIỀU HƯỚNG FULL TAB =====================
+    # ========== HỆ THỐNG ĐIỀU HƯỚNG FULL TAB =========
 
     # Gom tất cả widget của toàn TAB theo đúng thứ tự focus
     focus_list = []
-
     # 1) Thêm các Entry/Combo của Thông tin học sinh
     focus_list.extend(entries_hs)
-
     # 2) Thêm Entry điểm học kỳ 1
     for key in entry_diem_hk1:
         focus_list.append(entry_diem_hk1[key])
-
     # 3) Thêm Entry điểm học kỳ 2
     for key in entry_diem_hk2:
         focus_list.append(entry_diem_hk2[key])
-
     # 4) Thêm Khoản phí (radio + combo)
     focus_list.extend([
         combo_bhyt,
         combo_bhtn,
     ])
-    # ===================== Hàm điều hướng =====================
+    # ===================== Hàm điều hướng ==============
     def focus_next(event):
         widget = event.widget
         if widget in focus_list:
@@ -351,10 +353,7 @@ def admin_window():
     def load_data_hs():
         # Xóa dữ liệu cũ
         tree_info.delete(*tree_info.get_children())
-        tree_phi.delete(*tree_phi.get_children())
-        tree_hk1.delete(*tree_hk1.get_children())
-        tree_hk2.delete(*tree_hk2.get_children())
-
+    
         conn = connect_db()
         if not conn:
             messagebox.showerror("Lỗi kết nối", "Không thể kết nối đến cơ sở dữ liệu.")
@@ -377,11 +376,12 @@ def admin_window():
             messagebox.showerror("Lỗi SQL", str(e))
         finally:
             conn.close()
-
     # ===========================
     #    Load dữ liệu Khoản phí
     # ===========================
     def load_data_phi():
+        tree_phi.delete(*tree_phi.get_children())
+       
         conn = connect_db()
         if not conn:
             messagebox.showerror("Lỗi kết nối", "Không thể kết nối CSDL.")
@@ -404,8 +404,7 @@ def admin_window():
         except Exception as e:
             messagebox.showerror("Lỗi", f"Lỗi khi tải dữ liệu khoản phí: {e}")
         finally:
-            conn.close()
-    load_data_phi()
+            conn.close()        
     # ===========================
     #    Load dữ liệu Điểm số
     # ===========================
@@ -450,10 +449,13 @@ def admin_window():
         except Exception as e:
             messagebox.showerror("Lỗi", f"Lỗi tải điểm TBM: {e}")
         finally:
-            conn.close()
-    load_data_diem(tree_hk1, 1)
-    load_data_diem(tree_hk2, 2) 
-
+            conn.close() 
+    load_data_hs()    
+    load_data_phi()        # danh sách học sinh
+    load_data_diem(tree_hk1, 1)  # điểm HK1
+    load_data_diem(tree_hk2, 2)  # điểm HK2        
+    #====================================
+    #             HÀM THÊM
     def them_hs():
         # --- 1) Lấy dữ liệu từ form ---
         mahs = entries_hs[0].get().strip()
@@ -475,10 +477,8 @@ def admin_window():
         conn = connect_db()
         if not conn:
             return
-
         try:
             cur = conn.cursor()
-
             # --- Kiểm tra trùng Mã HS ---
             cur.execute("SELECT MaHS FROM HOCSINH WHERE MaHS=?", (mahs,))
             if cur.fetchone():
@@ -507,7 +507,7 @@ def admin_window():
                             INSERT INTO DIEM(MaHS, MaMon, HocKy, B1, B2, B3, B4, NamHoc)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                         """, (mahs, ma_mon, hk, b1, b2, b3, b4, "2024-2025"))
-
+            tree
             # --- 4) Thêm KHOANPHI ---
             da_hocphi = 1 if var_hocphi.get() == 1 else 0
             da_bhyt = 1 if var_bhyt.get() == 1 else 0
@@ -521,30 +521,20 @@ def admin_window():
             """, (mahs, "2024-2025", da_hocphi, da_bhyt, thang_bhyt, da_bhtn, muc_bhtn))
 
             conn.commit()
-            messagebox.showinfo("Thành công", f"Thêm học sinh {ho} {tenlot} {ten} thành công!")
-
-            # --- 6) Reset form ---
-            for e in entries_hs:
-                if isinstance(e, tk.Entry) or isinstance(e, DateEntry):
-                    e.delete(0, tk.END)
-                elif isinstance(e, ttk.Combobox):
-                    e.set('')
-            var_hocphi.set(0); var_bhyt.set(0); var_bhtn.set(0)
-            lbl_tongtien.config(text="0")
-            for d in list(entry_diem_hk1.values()) + list(entry_diem_hk2.values()):
-                d.delete(0, tk.END)
             lam_moi_form()
+            # -------- Reload dữ liệu lên Treeview --------
+            load_data_hs() 
+            load_data_phi()                   
+            load_data_diem(tree_hk1, 1)  
+            load_data_diem(tree_hk2, 2)  # điểm HK2
+               
+            messagebox.showinfo("Thành công", f"Thêm học sinh {ho} {tenlot} {ten} thành công!")    
         except Exception as e:
             conn.rollback()
             messagebox.showerror("Lỗi SQL", str(e))
-        finally:
-            conn.close()
-           # --- 5) Reload Treeview + tính TBM ---
-        load_data_hs()          # danh sách học sinh
-        load_data_diem(tree_hk1, 1)  # điểm HK1
-        load_data_diem(tree_hk2, 2)  # điểm HK2
-        load_data_phi()         # khoản phí
-    
+            
+    #====================================
+    #             HÀM SỬA
     def sua_hs():
         selected = tree_info.selection()
         if not selected:
@@ -559,7 +549,6 @@ def admin_window():
 
         try:
             cur = conn.cursor()
-
             # ---------------- 1) Load HOCSINH ----------------
             cur.execute("""
                 SELECT MaHS, Ho, TenLot, Ten, GioiTinh, NgaySinh, Lop, TinhTrang
@@ -651,7 +640,8 @@ def admin_window():
             conn.close()
 
 
-    # ====== Lưu học sinh + điểm + khoản phí ======
+    #====================================
+    #             HÀM LƯU
     def luu_hs():
         ma_hs = entries_hs[0].get().strip()
         if not ma_hs:
@@ -714,28 +704,31 @@ def admin_window():
                     DaDong_BHTN=?, Muc_BHTN=?
                 WHERE MaHS=? AND NamHoc=?
             """, (
-                int(var_hocphi.get()),         # YES/NO học phí
-                int(var_bhyt.get()),           # YES/NO BHYT
-                thang_bhyt,                    # NULL hoặc 1–12
-                int(var_bhtn.get()),           # YES/NO BHTN
-                muc_bhtn,                      # NULL hoặc mức tiền
+                int(var_hocphi.get()),         
+                int(var_bhyt.get()),           
+                thang_bhyt,                   
+                int(var_bhtn.get()),           
+                muc_bhtn,                      
                 ma_hs, "2024-2025"
             ))
             conn.commit()
             messagebox.showinfo("Thông báo", f" Đã Lưu học sinh {ma_hs} thành công!")
             lam_moi_form()
             # -------- Reload dữ liệu lên Treeview --------
-            load_data_hs()          # Treeview danh sách học sinh
-            load_data_diem(tree_hk1, 1)  # Treeview điểm học kỳ 1
-            load_data_diem(tree_hk2, 2)  # Treeview điểm học kỳ 2
-            load_data_phi()          # Treeview các khoản phí
+            load_data_hs() 
+            load_data_phi()                   
+            load_data_diem(tree_hk1, 1)  
+            load_data_diem(tree_hk2, 2) 
+        
 
         except Exception as e:
             conn.rollback()
             messagebox.showerror("Lỗi", f"Lưu thất bại: {e}")
         finally:
             conn.close()
-    # ====== Xóa học sinh ======
+
+    #====================================
+    #             HÀM XÓA
     def xoa_hs():
         selected = tree_info.selection()
         if not selected:
@@ -763,6 +756,7 @@ def admin_window():
             messagebox.showerror("Lỗi", str(e))
         finally:
             conn.close()
+
     # =========================
     # HÀM LÀM MỚI FORM HỌC SINH
     # =========================
@@ -772,11 +766,11 @@ def admin_window():
             # Xóa tất cả Entry trong frame thông tin học sinh
             for entry in entries_hs:
                 if isinstance(entry, ttk.Combobox):
-                    entry.set('')  # Combobox có set()
+                    entry.set('')  
                 elif isinstance(entry, DateEntry):
-                    entry.set_date(datetime.today())  # DateEntry dùng set_date()
+                    entry.set_date(datetime.today())  
                 else:
-                    entry.delete(0, 'end')  # Xóa Entry
+                    entry.delete(0, 'end')  
 
             # Reset điểm học kỳ 1
             for key, entry in entry_diem_hk1.items():
@@ -833,6 +827,7 @@ def admin_window():
             font=font.FONT_CHU, bg="#3326AD", fg="white"
         )
     btn_lam_moi_hs.grid(row=0, column=3, padx=8)
+
     # ============================================================
     # ---------------------- TAB GIÁO VIÊN ------------------------
     # ============================================================
@@ -919,7 +914,6 @@ def admin_window():
     scrollbar_gv_h.grid(row=1, column=0, sticky="ew")
 
     # ===================== HỆ THỐNG ĐIỀU HƯỚNG TAB GIÁO VIÊN =====================
-
     # Gom tất cả widget theo thứ tự để nhấn Enter → nhảy tiếp
     focus_gv = [
         entry_magv,
@@ -932,7 +926,6 @@ def admin_window():
         entry_sdt,
         entry_email
     ]
-
     # ------- Hàm nhảy tới widget kế tiếp -------
     def focus_next_gv(event):
         widget = event.widget
@@ -941,7 +934,6 @@ def admin_window():
             if idx < len(focus_gv) - 1:
                 focus_gv[idx + 1].focus_set()
         return "break"
-
     # ------- Hàm nhảy tới widget trước -------
     def focus_prev_gv(event):
         widget = event.widget
@@ -950,9 +942,7 @@ def admin_window():
             if idx > 0:
                 focus_gv[idx - 1].focus_set()
         return "break"
-
     # ===================== GÁN SỰ KIỆN =====================
-
     for w in focus_gv:
         # Enter → đi tới
         w.bind("<Return>", focus_next_gv)
@@ -978,7 +968,8 @@ def admin_window():
         ten = parts[-1]                   # Tên
         tenlot = " ".join(parts[1:-1]) if len(parts) > 2 else ""  # Tên lót (nếu có)
         return ho, tenlot, ten
-
+    #====================================
+    #             HÀM LÀM MỚI GV
     def lam_moi_gv():
         entry_magv.delete(0, 'end')
         entry_hoten.delete(0, 'end')
@@ -989,6 +980,8 @@ def admin_window():
         entry_sdt.delete(0, 'end')       
         entry_email.delete(0, 'end') 
 
+    #====================================
+    #             HÀM LOAD GV
     def load_data_gv():
         tree_gv.delete(*tree_gv.get_children())
         conn = connect_db()
@@ -1007,7 +1000,8 @@ def admin_window():
             messagebox.showerror("Lỗi SQL", str(e))
         finally:
             conn.close()
-
+    #====================================
+    #             HÀM THÊM GV
     def them_gv():
         magv = entry_magv.get().strip()
         hoten = entry_hoten.get().strip()
@@ -1015,8 +1009,8 @@ def admin_window():
         ngaysinh = date_ngaysinh_gv.get_date()
         monday = combo_monday.get()
         vaitro = combo_vaitro.get()
-        sdt = entry_sdt.get().strip()       # SĐT
-        email = entry_email.get().strip()   # Email
+        sdt = entry_sdt.get().strip()       
+        email = entry_email.get().strip()   
 
         if not magv or not hoten:
             messagebox.showwarning("Chú ý", "Chưa nhập đủ thông tin Mã GV và Họ tên!")
@@ -1039,7 +1033,8 @@ def admin_window():
         finally:
             conn.close()
 
-
+    #====================================
+    #             HÀM XÓA GV
     def xoa_gv():
         selected = tree_gv.selection()
         if not selected:
@@ -1059,7 +1054,8 @@ def admin_window():
                 messagebox.showerror("Lỗi", str(e))
             finally:
                 conn.close()
-
+    #====================================
+    #             HÀM SỬA GV
     def sua_gv():
         selected = tree_gv.selection()
         if not selected:
@@ -1081,8 +1077,8 @@ def admin_window():
         entry_email.delete(0, 'end')
         entry_email.insert(0, email if email else "")
 
-
-
+    #====================================
+    #             HÀM LƯU GV
     def luu_gv():
         magv = entry_magv.get().strip()
         hoten = entry_hoten.get().strip()
@@ -1114,7 +1110,6 @@ def admin_window():
             messagebox.showerror("Lỗi", str(e))
         finally:
             conn.close()
-
 
     # =========================
     #   GẮN HÀM CHO NÚT
@@ -1235,7 +1230,7 @@ def admin_window():
     tab_phi.grid_rowconfigure(0, weight=1)
     tab_phi.grid_columnconfigure(0, weight=1)
 
-    cols_phi = ["Mã HS", "Họ tên", "Lớp", "Học phí", "BHYT", "Tháng BHYT", "BHTN", "Mức BHTN", "Tổng tiền"]
+    cols_phi = ["Mã HS", "Họ tên", "Lớp", "Học phí", "BHYT", "Tháng BHYT", "BHTN", "Mức BHTN", "Tổng tiền","Hoàn Cảnh"]
     tree_phi = create_treeview(tab_phi, cols_phi)
 
     # ===========================
@@ -1249,9 +1244,9 @@ def admin_window():
         try:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT h.MaHS, h.HoTen, h.Lop,
+                SELECT h.MaHS, h.HoTen, h.Lop, h.HoanCanh
                     k.HocPhi, k.BHYT, k.Thang_BHYT,
-                    k.BHTN, k.Muc_BHTN, k.TongTien
+                    k.BHTN, k.Muc_BHTN, k.TongTien,
                 FROM HOCSINH h
                 LEFT JOIN KHOANPHI k ON h.MaHS = k.MaHS AND k.NamHoc='2024-2025'
                 ORDER BY h.Lop, h.HoTen
@@ -1266,7 +1261,6 @@ def admin_window():
         finally:
             conn.close()
 
- 
     # ===========================
     #    Load dữ liệu Điểm số
     # ===========================
@@ -1623,9 +1617,8 @@ def admin_window():
             messagebox.showerror("Lỗi", f"Lỗi khi tải dữ liệu lớp: {e}")
         finally:
             conn.close()
-
-    # Gọi load dữ liệu khi mở tab
     load_data_dshs_lop()
+
     # ===========================
     #     HÀM XUẤT EXCEL CÁC LỚP
     # ===========================

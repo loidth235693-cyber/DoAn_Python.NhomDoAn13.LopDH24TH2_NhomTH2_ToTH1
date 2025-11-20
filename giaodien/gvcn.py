@@ -15,12 +15,13 @@ def gvcn_window(magv):
     gvcn_window.configure(bg=font.BG_COLOR)
     
     style = ttk.Style()
-    style.theme_use('default')  # đảm bảo theme mặc định để có thể chỉnh màu
+    style.theme_use('default') 
     style.configure('TNotebook.Tab', background="#E8F4FB", foreground='black', padding=[10, 5])
 
     for i in range(4):
         gvcn_window.grid_rowconfigure(i, weight=1)
     gvcn_window.grid_columnconfigure(0, weight=1)
+    
     # ===== Tiêu đề =====
     title_label = tk.Label(
         gvcn_window, text="HỆ THỐNG QUẢN LÝ HỌC SINH",
